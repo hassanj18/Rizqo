@@ -25,7 +25,7 @@ class OTPService:
 
         # Generate OTP
         otp = OTPService.generate_otp()
-        otp_expiry = timezone.now() + datetime.timedelta(minutes=10)
+        otp_expiry = timezone.now() + datetime.timedelta(minutes=30)  # Increased to 30 minutes
         max_otp_try = int(user.max_otp_try) - 1
 
         # Update user object
@@ -55,18 +55,35 @@ class OTPService:
             return None,"User Does Not Exist"
     @staticmethod   
     def generate_cache_otp(cnic):
-        "Generat a 6 Digit OTP and store in cache with CNIC"
+        "Generate a 6 Digit OTP and store in cache with CNIC"
         otp = str(random.randint(100000, 999999))  # 6-digit OTP
+
+        print(f"Generated OTP: {otp} for CNIC: {cnic}")
         cache_key = f"otp_{cnic}"
-        cache.set(cache_key, otp, timeout=300)  # OTP valid for 5 mins
+        cache.set(cache_key, otp, timeout=1800)  # OTP valid for 30 mins (1800 seconds)
+        
+        # Verify it was stored
+        stored_otp = cache.get(cache_key)
+        print(f"OTP stored in cache: {stored_otp}")
+        print(f"Cache key: {cache_key}")
+        
         return otp     
-    @staticmethod
+    
+    @staticmethod   
     def verify_cache_otp(cnic, otp):
         cache_key = f"otp_{cnic}"
         cached_otp = cache.get(cache_key)
+        print(f"Verifying OTP for CNIC: {cnic}")
+        print(f"Cache key: {cache_key}")
+        print(f"Submitted OTP: {otp}")
+        print(f"Cached OTP: {cached_otp}")
+        print(f"OTP match: {cached_otp == otp}")
+        
         if cached_otp and cached_otp == otp:
             cache.delete(cache_key)  # OTP used once
+            print(f"OTP verified successfully for CNIC: {cnic}")
             return True
+        print(f"OTP verification failed for CNIC: {cnic}")
         return False
     @staticmethod
     def verify_otp(request, otp: str):

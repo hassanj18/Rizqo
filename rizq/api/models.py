@@ -9,24 +9,30 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, cnic, phone_no, dob, **extra_fields):
+    def create_user(self, cnic, phone, dob, full_name, gender, **extra_fields):
         if not cnic:
             raise ValueError("CNIC is required")
+        if not full_name:
+            raise ValueError("Full name is required")
+        if not gender:
+            raise ValueError("Gender is required")
 
         user = self.model(
             cnic=cnic,
-            phone_no=phone_no,
+            phone=phone,
             dob=dob,
+            full_name=full_name,
+            gender=gender,
             **extra_fields
         )
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, cnic, phone_no, dob, **extra_fields):
+    def create_superuser(self, cnic, phone, dob, full_name, gender, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
-        return self.create_user(cnic, phone_no, dob, **extra_fields)
+        return self.create_user(cnic, phone, dob, full_name, gender, **extra_fields)
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -63,7 +69,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     USERNAME_FIELD = "cnic"
-    REQUIRED_FIELDS = ["phone_no", "dob"]
+    REQUIRED_FIELDS = ["phone", "dob", "full_name", "gender"]
 
     def __str__(self):
         return self.cnic
