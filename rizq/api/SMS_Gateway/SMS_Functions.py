@@ -31,5 +31,3 @@ def send_msg(phone: str, msg: str):
 
 def send_otp(phone: str, otp: str):
     send_msg(phone,f"Your One-Time-Password for Rizqo is {otp}")
-
-# send_otp("03333557903","123654")

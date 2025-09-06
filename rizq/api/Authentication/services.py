@@ -11,6 +11,37 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class OTPService:
     @staticmethod
+    def validate_cnic_gender(cnic: str, gender: str) -> tuple[bool, str]:
+        """
+        Validate CNIC last digit against gender encoding.
+        Pakistani CNIC encoding: Male (1,3,5,7,9), Female (2,4,6,8,0)
+        Returns (is_valid, error_message)
+        """
+        if not cnic or len(cnic) != 13:
+            return False, "CNIC must be exactly 13 digits"
+        
+        last_digit = int(cnic[-1])
+        gender_lower = gender.lower()
+        
+        print("Gender is:- ", gender)
+        print("CNIC is:- ", cnic)
+        print("Last digit is:- ", last_digit)
+        # print("Gender is:- ", gender_lower)
+        if gender_lower == "male":
+            if last_digit not in [1, 3, 5, 7, 9]:
+                return False, "CNIC gender decoding failure.😎"
+        elif gender_lower == "female":
+            if last_digit not in [2, 4, 6, 8, 0]:
+                return False, "CNIC gender decoding failure.😎"
+        elif gender_lower == "other":
+            # For "other" gender, we don't validate CNIC encoding
+            return True, ""
+        else:
+            return False, "Invalid gender. Please select Male, Female, or Other"
+        
+        return True, ""
+
+    @staticmethod
     def generate_otp():
         """Generate a 4-digit OTP"""
         return random.randint(100000, 999999)

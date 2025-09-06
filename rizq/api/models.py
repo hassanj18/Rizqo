@@ -41,12 +41,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         message="CNIC must be exactly 13 digits."
     )
     GENDER_CHOICES = [
-    ("M", "Male"),
-    ("F", "Female"),
-    ("O", "Other"),
+    ("male", "Male"),
+    ("female", "Female"),
+    ("other", "Other"),
     ]
     full_name = models.CharField(max_length=255,null=False,blank=False)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES,null=False,blank=False)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES,null=False,blank=False)
     cnic = models.CharField(
         max_length=13,
         unique=True,

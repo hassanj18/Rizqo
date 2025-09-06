@@ -74,6 +74,11 @@ def request_signup_otp(request):
     if not dob:
         return Response({"error": "dob is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    # Validate CNIC format and gender encoding
+    is_valid_cnic_gender, cnic_gender_error = OTPService.validate_cnic_gender(cnic, gender)
+    if not is_valid_cnic_gender:
+        return Response({"error": cnic_gender_error}, status=status.HTTP_400_BAD_REQUEST)
+
     # Block if CNIC or phone is already registered
     if CustomUser.objects.filter(cnic=cnic).exists():
         return Response({"message": "This CNIC is already registered."}, status=status.HTTP_400_BAD_REQUEST)
@@ -125,6 +130,13 @@ class SignupViewSet(viewsets.ModelViewSet):
             'dob': request.data.get('dob'),
             'password': request.data.get('password', 'defaultPassword123')
         }
+
+        # Validate CNIC-gender consistency again during final signup
+        is_valid_cnic_gender, cnic_gender_error = OTPService.validate_cnic_gender(
+            signup_data['cnic'], signup_data['gender']
+        )
+        if not is_valid_cnic_gender:
+            return Response({"error": cnic_gender_error}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create serializer instance with the mapped data
         serializer = self.get_serializer(data=signup_data)

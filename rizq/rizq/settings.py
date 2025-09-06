@@ -122,10 +122,27 @@ WSGI_APPLICATION = 'rizq.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres.isnwqnvyesnieslnpczy',
+        'PASSWORD': 's8D3XVNJgXPxSKqF',
+        'HOST': 'aws-1-ap-southeast-1.pooler.supabase.com',
+        'PORT': '5432',
     }
 }
+
+# Database connection check
+def check_database_connection():
+    try:
+        from django.db import connection
+        connection.ensure_connection()
+        print("😉 Database connected successfully!")
+    except Exception as e:
+        print(f"Database connection failed: {e}")
+
+# Check database connection on startup
+if DEBUG:
+    check_database_connection()
 
 
 # Password validation
